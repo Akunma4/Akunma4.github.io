@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Akunma — Minecraft Plugin Dev</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0c0c0c;
+  --off:#111;
+  --border:#1e1e1e;
+  --lime:#c6ff00;
+  --orange:#ff5c00;
+  --white:#f0ede6;
+  --muted:#5a5a5a;
+  --muted2:#333;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--white);font-family:'Syne',sans-serif;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.025) 3px,rgba(0,0,0,0.025) 4px);}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 52px;height:60px;background:var(--bg);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'Anton',sans-serif;font-size:1.4rem;letter-spacing:5px;color:var(--lime);}
+.nav-links{display:flex;gap:0;list-style:none;}
+.nav-links li{border-left:1px solid var(--border);}
+.nav-links a{display:block;padding:0 20px;height:60px;line-height:60px;font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.15s,background 0.15s;}
+.nav-links a:hover{color:var(--white);background:var(--off);}
+.nav-cta{background:var(--lime)!important;color:#000!important;font-weight:500;}
+.nav-cta:hover{background:#aadd00!important;}
+
+/* HERO */
+#hero{min-height:100vh;display:grid;grid-template-columns:1fr 380px;border-top:60px solid transparent;}
+.hero-left{padding:80px 60px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:3px;color:var(--orange);text-transform:uppercase;margin-bottom:36px;display:flex;align-items:center;gap:12px;}
+.hero-eyebrow::before{content:'';width:28px;height:1px;background:var(--orange);}
+.hero-name{font-family:'Anton',sans-serif;font-size:clamp(5rem,11vw,9.5rem);line-height:0.86;letter-spacing:1px;color:var(--white);margin-bottom:44px;}
+.hero-name em{color:var(--lime);font-style:normal;}
+.hero-tagline{font-size:1.05rem;line-height:1.75;color:var(--muted);max-width:480px;margin-bottom:52px;font-weight:400;}
+.hero-tagline strong{color:var(--white);font-weight:700;}
+.hero-btns{display:flex;}
+.btn-main{padding:15px 34px;background:var(--lime);color:#000;font-family:'DM Mono',monospace;font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;font-weight:500;text-decoration:none;transition:background 0.15s;}
+.btn-main:hover{background:#aadd00;}
+.btn-ghost{padding:15px 32px;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border:1px solid var(--border);border-left:none;transition:color 0.15s;}
+.btn-ghost:hover{color:var(--white);}
+.hero-right{display:flex;flex-direction:column;}
+.hero-stat{padding:0 44px;flex:1;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+.hero-stat:last-child{border-bottom:none;}
+.hero-stat-ghost{position:absolute;right:-8px;bottom:-16px;font-family:'Anton',sans-serif;font-size:7rem;color:rgba(255,255,255,0.025);line-height:1;pointer-events:none;}
+.stat-n{font-family:'Anton',sans-serif;font-size:4rem;color:var(--lime);line-height:1;margin-bottom:8px;}
+.stat-l{font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+
+/* TICKER */
+.ticker{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--off);overflow:hidden;padding:13px 0;white-space:nowrap;}
+.ticker-t{display:inline-block;animation:tick 32s linear infinite;font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.ticker-t b{color:var(--lime);margin:0 22px;font-weight:400;}
+@keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* SECTIONS */
+.wrap{max-width:1200px;margin:0 auto;}
+.sec{padding:110px 60px;border-top:1px solid var(--border);}
+.sec-head{display:flex;align-items:baseline;gap:20px;margin-bottom:64px;}
+.sec-n{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted2);letter-spacing:2px;}
+.sec-t{font-family:'Anton',sans-serif;font-size:clamp(2.2rem,4.5vw,3.8rem);letter-spacing:2px;color:var(--white);line-height:1;}
+.sec-t em{color:var(--lime);font-style:normal;}
+
+/* SERVICES */
+.svc-list{display:flex;flex-direction:column;}
+.svc-row{display:grid;grid-template-columns:48px 1fr 90px;gap:28px;align-items:start;padding:32px 0;border-top:1px solid var(--border);cursor:default;transition:background 0.18s;padding-left:8px;padding-right:8px;}
+.svc-row:last-child{border-bottom:1px solid var(--border);}
+.svc-row:hover{background:rgba(255,255,255,0.018);}
+.svc-row:hover .svc-title{color:var(--lime);}
+.svc-i{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted2);letter-spacing:1px;padding-top:5px;}
+.svc-b{}
+.svc-title{font-family:'Anton',sans-serif;font-size:1.5rem;letter-spacing:1px;color:var(--white);margin-bottom:8px;transition:color 0.18s;}
+.svc-p{font-size:0.9rem;color:var(--muted);line-height:1.65;max-width:540px;}
+.svc-badge{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:2px;color:var(--orange);border:1px solid rgba(255,92,0,0.2);padding:4px 8px;white-space:nowrap;align-self:flex-start;margin-top:5px;text-transform:uppercase;}
+
+/* SKILLS */
+.skill-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);}
+.skill-c{padding:28px 22px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);transition:background 0.18s;}
+.skill-c:nth-child(4n){border-right:none;}
+.skill-c:nth-last-child(-n+4){border-bottom:none;}
+.skill-c:hover{background:var(--off);}
+.sk-ico{font-size:1.2rem;margin-bottom:14px;display:block;}
+.sk-name{font-size:0.88rem;font-weight:700;color:var(--white);margin-bottom:6px;}
+.sk-detail{font-family:'DM Mono',monospace;font-size:0.67rem;color:var(--muted);line-height:1.55;}
+
+/* WORK */
+.work-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border);}
+.work-c{padding:44px 36px;border-right:1px solid var(--border);transition:background 0.2s;position:relative;overflow:hidden;}
+.work-c:last-child{border-right:none;}
+.work-c:hover{background:var(--off);}
+.work-c::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity 0.2s;}
+.work-c:nth-child(1)::after{background:var(--lime);}
+.work-c:nth-child(2)::after{background:var(--orange);}
+.work-c:nth-child(3)::after{background:#9933ff;}
+.work-c:hover::after{opacity:1;}
+.w-ico{font-size:2rem;margin-bottom:24px;display:block;}
+.w-tag{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;}
+.w-name{font-family:'Anton',sans-serif;font-size:1.7rem;letter-spacing:1px;color:var(--white);margin-bottom:16px;}
+.w-desc{font-size:0.88rem;color:var(--muted);line-height:1.65;}
+
+/* CTA */
+#cta{border-top:1px solid var(--border);}
+.cta-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;padding:110px 60px;max-width:1200px;margin:0 auto;}
+.cta-label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:3px;color:var(--orange);text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px;}
+.cta-label::before{content:'';width:22px;height:1px;background:var(--orange);}
+.cta-h{font-family:'Anton',sans-serif;font-size:clamp(2.6rem,4.5vw,4.2rem);line-height:0.9;letter-spacing:2px;color:var(--white);margin-bottom:28px;}
+.cta-h em{color:var(--lime);font-style:normal;}
+.cta-p{font-size:0.98rem;color:var(--muted);line-height:1.7;}
+.disc-link{display:flex;align-items:center;gap:20px;padding:26px 30px;background:var(--off);border:1px solid var(--border);text-decoration:none;margin-bottom:20px;transition:border-color 0.18s;}
+.disc-link:hover{border-color:var(--lime);}
+.disc-link:hover .d-arr{transform:translateX(6px);color:var(--lime);}
+.d-ico{font-size:1.8rem;}
+.d-lbl{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
+.d-handle{font-family:'Anton',sans-serif;font-size:1.3rem;letter-spacing:2px;color:var(--white);}
+.d-arr{margin-left:auto;font-size:1.3rem;color:var(--muted2);transition:transform 0.18s,color 0.18s;}
+.cta-note{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted2);letter-spacing:1px;line-height:1.7;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:28px 52px;display:flex;align-items:center;justify-content:space-between;}
+.f-brand{font-family:'Anton',sans-serif;font-size:1rem;letter-spacing:5px;color:var(--muted2);}
+.f-copy{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted2);letter-spacing:1px;}
+
+/* REVEAL */
+.r{opacity:0;transform:translateY(20px);transition:opacity 0.55s ease,transform 0.55s ease;}
+.r.in{opacity:1;transform:none;}
+
+@media(max-width:900px){
+  #hero{grid-template-columns:1fr;}
+  .hero-right{display:none;}
+  nav{padding:0 24px;}
+  .nav-links li:not(:last-child){display:none;}
+  .sec{padding:72px 24px;}
+  .skill-grid{grid-template-columns:repeat(2,1fr);}
+  .skill-c:nth-child(2n){border-right:none;}
+  .skill-c:nth-last-child(-n+2){border-bottom:none;}
+  .skill-c:nth-child(4n){border-right:1px solid var(--border);}
+  .skill-c:nth-child(2n){border-right:none;}
+  .work-grid{grid-template-columns:1fr;}
+  .work-c{border-right:none!important;border-bottom:1px solid var(--border);}
+  .work-c:last-child{border-bottom:none;}
+  .cta-inner{grid-template-columns:1fr;gap:44px;padding:72px 24px;}
+  footer{flex-direction:column;gap:10px;padding:24px;text-align:center;}
+  .hero-left{padding:60px 28px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AKUNMA</div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="https://discord.com/users/1187066828552421438" target="_blank" class="nav-cta">Hire Me</a></li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Minecraft Plugin Developer</div>
+    <h1 class="hero-name">AKU<em>N</em>MA</h1>
+    <p class="hero-tagline">
+      I build the plugins other devs say <strong>can't be done.</strong> Custom weapons, multi-phase bosses, full minigame engines, Minemen-level combat — for SMPs that actually want to stand out.
+    </p>
+    <div class="hero-btns">
+      <a href="#services" class="btn-main">See What I Build</a>
+      <a href="https://discord.com/users/1187066828552421438" target="_blank" class="btn-ghost">Discord: akunma4</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-stat">
+      <div class="hero-stat-ghost">10</div>
+      <div class="stat-n">10+</div>
+      <div class="stat-l">Plugins shipped</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-ghost">5</div>
+      <div class="stat-n">5+</div>
+      <div class="stat-l">SMPs powered</div>
+    </div>
+  </div>
+</section>
+
+<div class="ticker">
+  <span class="ticker-t">
+    Custom Weapons <b>×</b> Boss Fights <b>×</b> Minigames <b>×</b> KitPvP <b>×</b> Minemen-Style Combat <b>×</b> SMP Systems <b>×</b> Economy Plugins <b>×</b> Custom Abilities <b>×</b> Dungeons <b>×</b> Particle FX <b>×</b> Ranked Ladders <b>×</b> Season Resets <b>×</b>
+    Custom Weapons <b>×</b> Boss Fights <b>×</b> Minigames <b>×</b> KitPvP <b>×</b> Minemen-Style Combat <b>×</b> SMP Systems <b>×</b> Economy Plugins <b>×</b> Custom Abilities <b>×</b> Dungeons <b>×</b> Particle FX <b>×</b> Ranked Ladders <b>×</b> Season Resets <b>×</b>
+  </span>
+</div>
+
+<div class="wrap">
+  <div class="sec r" id="services">
+    <div class="sec-head">
+      <span class="sec-n">01</span>
+      <h2 class="sec-t">What I <em>Build</em></h2>
+    </div>
+    <div class="svc-list">
+      <div class="svc-row r">
+        <span class="svc-i">01</span>
+        <div class="svc-b">
+          <div class="svc-title">Custom Weapons & Items</div>
+          <p class="svc-p">Legendary swords with particle trails, bows that fork mid-air, throwable weapons with physics — everything handcoded. No resource packs needed.</p>
+        </div>
+        <span class="svc-badge">Advanced</span>
+      </div>
+      <div class="svc-row r">
+        <span class="svc-i">02</span>
+        <div class="svc-b">
+          <div class="svc-title">Boss Fights & Dungeons</div>
+          <p class="svc-p">Multi-phase encounters with scripted moves, custom health bars, arena logic, and loot systems. The kind of fight players actually record and post.</p>
+        </div>
+        <span class="svc-badge">Epic Tier</span>
+      </div>
+      <div class="svc-row r">
+        <span class="svc-i">03</span>
+        <div class="svc-b">
+          <div class="svc-title">Abilities & Class Systems</div>
+          <p class="svc-p">Cooldown-based abilities, class progression, unique kits — built to make PvP feel alive and keep players grinding for more.</p>
+        </div>
+        <span class="svc-badge">Complex</span>
+      </div>
+      <div class="svc-row r">
+        <span class="svc-i">04</span>
+        <div class="svc-b">
+          <div class="svc-title">Minigames</div>
+          <p class="svc-p">BedWars, SkyWars, KitPvP, Sumo, custom modes — full queue systems, scoreboards, stat tracking. Or bring your own idea and I'll build it from zero.</p>
+        </div>
+        <span class="svc-badge">Full Systems</span>
+      </div>
+      <div class="svc-row r">
+        <span class="svc-i">05</span>
+        <div class="svc-b">
+          <div class="svc-title">Minemen-Style Combat</div>
+          <p class="svc-p">1.8 PvP feel on modern versions. Custom knockback, combo windows, pearl timers, ELO ladders — if you want Minemen on your server, I know how to get you there.</p>
+        </div>
+        <span class="svc-badge">Precision</span>
+      </div>
+      <div class="svc-row r">
+        <span class="svc-i">06</span>
+        <div class="svc-b">
+          <div class="svc-title">Full SMP Ecosystems</div>
+          <p class="svc-p">Economy, quests, season resets, custom crafting, faction systems, player shops — build the whole thing or drop into what you already have.</p>
+        </div>
+        <span class="svc-badge">Enterprise</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec r" id="skills">
+    <div class="sec-head">
+      <span class="sec-n">02</span>
+      <h2 class="sec-t">Technical <em>Stack</em></h2>
+    </div>
+    <div class="skill-grid">
+      <div class="skill-c r"><span class="sk-ico">⚡</span><div class="sk-name">Particle Systems</div><div class="sk-detail">NMS & PacketAPI — trails, auras, hit FX, explosions</div></div>
+      <div class="skill-c r"><span class="sk-ico">📋</span><div class="sk-name">Custom Scoreboards</div><div class="sk-detail">Animated sidebars, tab lists, boss bars, live data</div></div>
+      <div class="skill-c r"><span class="sk-ico">🌍</span><div class="sk-name">World Generation</div><div class="sk-detail">Custom biomes, structures, dungeon room layouts</div></div>
+      <div class="skill-c r"><span class="sk-ico">🗃️</span><div class="sk-name">Custom GUIs</div><div class="sk-detail">Inventory menus, shops, stat screens — zero deps</div></div>
+      <div class="skill-c r"><span class="sk-ico">🔁</span><div class="sk-name">Async Event Logic</div><div class="sk-detail">Scheduled tasks, complex event chains, zero lag</div></div>
+      <div class="skill-c r"><span class="sk-ico">💾</span><div class="sk-name">Database Integration</div><div class="sk-detail">MySQL, SQLite, MongoDB — persistent cross-session data</div></div>
+      <div class="skill-c r"><span class="sk-ico">🔌</span><div class="sk-name">API Compatibility</div><div class="sk-detail">PlaceholderAPI, Vault, LuckPerms, WorldGuard</div></div>
+      <div class="skill-c r"><span class="sk-ico">⚙️</span><div class="sk-name">Config-Driven</div><div class="sk-detail">Clean YML configs — tweak everything without code</div></div>
+    </div>
+  </div>
+
+  <div class="sec r" id="work">
+    <div class="sec-head">
+      <span class="sec-n">03</span>
+      <h2 class="sec-t">Past <em>Work</em></h2>
+    </div>
+    <div class="work-grid">
+      <div class="work-c r">
+        <span class="w-ico">💀</span>
+        <div class="w-tag">SMP Project</div>
+        <div class="w-name">Souls SMP</div>
+        <p class="w-desc">Dark-fantasy SMP with custom soul mechanics, death penalties, eerie boss encounters, and a world that punishes the unprepared. Every system built from scratch.</p>
+      </div>
+      <div class="work-c r">
+        <span class="w-ico">🌌</span>
+        <div class="w-tag">SMP Project</div>
+        <div class="w-name">Nexus SMP</div>
+        <p class="w-desc">High-tech interconnected SMP — custom portals, faction warfare, dynamic economy. Multiple plugin systems running together without a single hitch.</p>
+      </div>
+      <div class="work-c r">
+        <span class="w-ico">🎰</span>
+        <div class="w-tag">SMP Project</div>
+        <div class="w-name">Gamble SMP</div>
+        <p class="w-desc">High-stakes server with gambling mechanics, loot roulettes, risk-reward systems and player wagering. Where every move costs something.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="cta">
+  <div class="cta-inner">
+    <div class="r">
+      <div class="cta-label">Get in touch</div>
+      <h2 class="cta-h">Got a server.<br>Need <em>plugins.</em></h2>
+      <p class="cta-p">No idea is too weird. If you can describe it, there's a good chance I can build it. Hit me on Discord and we'll figure out the rest.</p>
+    </div>
+    <div class="r">
+      <a href="https://discord.com/users/1187066828552421438" target="_blank" class="disc-link">
+        <span class="d-ico">💬</span>
+        <div>
+          <div class="d-lbl">Discord</div>
+          <div class="d-handle">akunma4</div>
+        </div>
+        <span class="d-arr">→</span>
+      </a>
+      <p class="cta-note">Response time is usually fast. Bring your idea, your budget, and your timeline — I'll tell you what's possible.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="f-brand">AKUNMA</div>
+  <div class="f-copy">© 2025 · Minecraft Plugin Development · discord: akunma4</div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
+}, {threshold: 0.07});
+document.querySelectorAll('.r').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
